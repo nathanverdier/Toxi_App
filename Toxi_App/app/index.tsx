@@ -4,8 +4,20 @@ import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { useRouter } from 'expo-router';
 
 export default function HomeScreen() {
+
+  const router = useRouter();
+
+  const handlePressAddSomeone = () => {
+    router.push('addsomeone');
+  };
+
+  const handlePressSeeEveryone = () => {
+    router.push('seeveryone');
+  };
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
@@ -21,16 +33,8 @@ export default function HomeScreen() {
         <ThemedText type="title">Welcome on Toxi_App!</ThemedText>
         <HelloWave />
       </ThemedView>
-      <Button
-        title="Add someone"
-        color="#A1CEDC"
-        //onPress={() => navigation.navigate('explore')}
-      />
-      <Button
-        title="See everyone"
-        color="#A1CEDC"
-        //onPress={() => navigation.navigate('explore')}
-      />
+      <Button color={"#A1CEDC"} onPress={handlePressAddSomeone} title="Add someone" />
+      <Button color={"#A1CEDC"} onPress={handlePressSeeEveryone} title="See everyone" />
     </ParallaxScrollView>
   );
 }
