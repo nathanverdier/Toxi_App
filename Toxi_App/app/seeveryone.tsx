@@ -6,7 +6,7 @@ export default function SeeEveryone() {
   const auth0Token = 'your-auth0-token';
 
   useEffect(() => {
-    fetch('https://your-api.com/users', {
+    fetch('http://localhost:8081/v1/person', {
       headers: {
         Authorization: `Bearer ${auth0Token}`,
       },
