@@ -1,52 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import { Image, Text, View, ActivityIndicator, StyleSheet } from 'react-native';
-//import { REACT_APP_AUTH0_TOKEN } from '@env';
+import {useDispatch, useSelector} from "react-redux"
+import { getPersoneList } from '@/Redux/thunk/PersonneThunk';
+import { CataloguePersonne } from '@/components/PersonneCatalogue';
+
+import { RootState } from '@/Redux/store';
 
 export default function SeeEveryone() {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-//   useEffect(() => {
-//     fetch('http://localhost:8081/v1/person', {
-//       headers: {
-//         Authorization: `Bearer ${REACT_APP_AUTH0_TOKEN}`,
-//       },
-//     })
-//       .then(response => response.json())
-//       .then(data => {
-//         setUsers(data);
-//         setLoading(false);
-//       })
-//       .catch(error => {
-//         console.error(error);
-//         setError(error);
-//         setLoading(false);
-//       });
-//   }, []);
+  const PersonneList = useSelector((state: RootState) => state.personne.personnes)
 
-//   if (loading) {
-//     return <ActivityIndicator size="large" color="#0000ff" />;
-//   }
+  const dispatch = useDispatch()
+  
+  useEffect(() => {
+    const loadPersonnes = async() => {
+      // @ts-ignore
+      dispatch(getPersoneList());
+    };
+    loadPersonnes()
+  }, [dispatch])
 
-//   if (error) {
-//     return <Text>Error loading users: {error.message}</Text>;
-//   }
 
-//   if (users.length === 0) {
-//     return <Text>No users found</Text>;
-//   }
 
-//   return (
-//     <View style={styles.container}>
-//       {users.map(user => (
-//         <View key={user._id} style={styles.userContainer}>
-//           <Image source={{ uri: user.image }} style={styles.image} />
-//           <Text style={styles.text}>{user.name}</Text>
-//         </View>
-//       ))}
-//     </View>
-//   );
+  return (
+        <View>
+          <CataloguePersonne dataPersonne={PersonneList}/>
+        </View>
+  );
 }
 
 const styles = StyleSheet.create({
