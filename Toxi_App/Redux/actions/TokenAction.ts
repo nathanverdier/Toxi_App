@@ -1,5 +1,19 @@
-// @ts-ignore
-import { createAction } from '@reduxjs/toolkit';
+import { Token } from '@/model/Token';
 
-export const setToken = createAction<string>('token/set');
-export const clearToken = createAction('token/clear');
+export enum ActionTypes {
+    FETCH_TOKEN = 'FETCH_TOKEN',
+}
+
+interface actionFetch {
+    type: ActionTypes.FETCH_TOKEN,
+    payload: Token
+}
+
+export type Action = actionFetch
+
+export const setToken = (token : Token) : Action => {
+    return {
+        type: ActionTypes.FETCH_TOKEN,
+        payload: token
+    }
+}
