@@ -1,13 +1,25 @@
-// @ts-ignore
-import { createReducer } from '@reduxjs/toolkit';
-import { setToken, clearToken } from '../actions/TokenAction';
+import { Token } from "@/model/Token";
+import {Action, ActionTypes} from "../actions/TokenAction";
 
-// @ts-ignore
-const tokenReducer = createReducer<string | null>(null, (builder) => {
-  builder
-    // @ts-ignore
-    .addCase(setToken, (state, action) => action.payload)
-    .addCase(clearToken, () => null);
-});
 
-export default tokenReducer;
+interface State {
+  token : Token
+}
+
+const initialState = {
+  token : new Token("", 0,"")
+}
+
+const appReducerToken = (state : State = initialState, action : Action) => {
+  switch (action.type) {
+    case ActionTypes.FETCH_TOKEN:
+      return {
+        ...state,
+        token : action.payload
+      }
+    default:
+      return state
+  }
+}
+
+export default appReducerToken
