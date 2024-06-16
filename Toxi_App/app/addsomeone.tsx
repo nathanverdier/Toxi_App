@@ -5,12 +5,16 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { ImagePickerResult, ImagePickerSuccessResult } from 'expo-image-picker';
+import { postPersonne } from '@/Redux/thunk/PersonneThunk';
+import { useDispatch } from 'react-redux';
 
 export default function TabTwoScreen() {
   const [name, setName] = useState('');
   const [image, setImage] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));  
+
+  const dispatch = useDispatch();
 
   const openModal = () => {
     setModalVisible(true);
@@ -57,6 +61,17 @@ export default function TabTwoScreen() {
       setImage(successResult.assets[0].uri);
       closeModal();
     }
+  };
+
+  const validatePersonne = () => {
+    if (!image || !name) {
+      return;
+    }
+    // @ts-ignore
+    dispatch(postPersonne(name, image, () => {
+      setName('');
+      setImage('');
+    }));
   };
 
   return (
@@ -117,9 +132,8 @@ export default function TabTwoScreen() {
       <Button
         title="Validé"
         color="#A1CEDC"
-        disabled={!image || !name}
         onPress={() => {
-          // Action to perform when the button is pressed
+          validatePersonne();
         }}
       />
     </ParallaxScrollView>
