@@ -1,26 +1,22 @@
+import {getToken } from './TokenThunk';
 import {PersonneFactory} from "../../model/PersonneFactory";
 import { setPersonnesList, addPersonne } from "../actions/PersonneActions"
-import { Dispatch } from "redux";
 
-let _urlPersonneList : string = "http://localhost:8081/v1/person";
-let _urlAddPersonne : string = "";
-
-import { RootState } from '../store';
+let _urlPersonneList : string = "https://codefirst.iut.uca.fr/containers/ToxiTeam-toxi-api/v1/person";
 
 export const getPersoneList = () => {
     // @ts-ignore
-    return async (dispatch, getState) => {
+    return async (dispatch) => {
         try {
-            console.log("Je rentre dans le getPersonneList:");
-            const state = getState() as RootState;
-            console.log("J'ai passé le stat:");
-
+            const token = await getToken();
+            console.log("Token récupérer après le call API All Personne:", token);
             console.log("Je fais le call API");
             let response;
             try {
                 response = await fetch(_urlPersonneList, {
+                    method: 'GET',
                     headers: {
-                        "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Im8tWEpRYkVvaG14TzNEWFU5MGJlZCJ9.eyJpc3MiOiJodHRwczovL2Rldi0zamE3M3dwZnAxajZ1emVkLnVzLmF1dGgwLmNvbS8iLCJzdWIiOiJlQWY4ejR2UzNCNDdMR2F0VG4zNHEzOElSZEpyTk52Y0BjbGllbnRzIiwiYXVkIjoiaHR0cHM6Ly90b3hpYXBpLyIsImlhdCI6MTcxNzM1MjYyMiwiZXhwIjoxNzE3NDM5MDIyLCJndHkiOiJjbGllbnQtY3JlZGVudGlhbHMiLCJhenAiOiJlQWY4ejR2UzNCNDdMR2F0VG4zNHEzOElSZEpyTk52YyJ9.aSLqTgwS1i3acV2xLlccnFuWsoUinFExcQhKFvVvQ1DnCnzpvwT19PaHqqPz2UJ1rbr-pOT34qiL0bz3WzqEzUo0dg6g6rLDsNwKNOeJc-uWX29h7BJVBdYCwNaGl7bfM0lji_xU3qqZcGD2lsld0JNJQXCLfW6ly3TCUOfjsEKnkCBldDfZmjYBv4ShTHNNC_jL5WqEp6dNy6ALyLcn9CWOeyGLECgviFcyPiVzeKtkU0uTKqJ9_gYAA569MHSgSFIXcK_LDTgkEDk4C1dvy0bZOCAwcLQGo3hRFo5VF_ZUYekP_KZlfUg2enCMTz0eK8Vkzw_6yFWYLKkszu3arw"
+                        'Authorization': 'Bearer ' + token?.getTokenString(),
                     },
                 });
                 if (!response.ok) {
@@ -28,7 +24,7 @@ export const getPersoneList = () => {
                 }
             } catch (fetchError) {
                 console.error("Erreur lors de la requête fetch:", fetchError);
-                throw fetchError; // Propager l'erreur pour qu'elle soit capturée par le catch externe
+                throw fetchError;
             }
 
             console.log("Response de fetch:", response);
@@ -44,29 +40,54 @@ export const getPersoneList = () => {
     };
 };
 
+const convertImageToBase64 = async (imageUri: string): Promise<string | null> => {
+    try {
+      const response = await fetch(imageUri);
+      const blob = await response.blob();
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64data = reader.result;
+          resolve(base64data as string);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.error("Erreur lors de la conversion de l'image en base64", error);
+      return null;
+    }
+  };
 
 export const postPersonne = (name : string, image : string, onSucces : () => void) => {
     // @ts-ignore
-    return async(dispatch : Dispatch, getState) => {
+    return async(dispatch) => {
         try {
-            const state = getState() as RootState;
-            const token = state.token;
-
-            const response = await fetch(_urlAddPersonne, {
+            const token = await getToken();
+            console.log("Token récupérer après le call API All Personne:", token);
+            console.log("Je fais le call API");
+    
+            let imageOnApi = await convertImageToBase64(image);
+            // Extraire la partie base64 de l'image
+            const base64Pattern = /^data:image\/[a-z]+;base64,/;
+            imageOnApi = imageOnApi!.replace(base64Pattern, "");
+    
+            const response = await fetch(_urlPersonneList, {
                 method: 'POST',
                 headers: {
                     'Content-Type' : 'application/json',
-                    'Authorization': `Bearer ${token}`,
+                    'Authorization': 'Bearer ' + token?.getTokenString(),
                 },
                 body : JSON.stringify(
                     {
                         name,
-                        image
+                        image: imageOnApi,
                     }
                 )
             });
-    
+            console.log("Response de fetch:", response);
             if (response.ok) {
+                console.log("Personne ajouté avec succès");
                 dispatch(addPersonne(name, image))
                 // @ts-ignore
                 dispatch(getPersoneList())
