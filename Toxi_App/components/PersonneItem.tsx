@@ -11,7 +11,7 @@ export function PersonneItem({personne} : PersonneItemProps) {
 
     return (
         <View style={styles.container}>
-            <Image source={{uri: personne.getImage()}} style={styles.image} />
+            <Image source={{uri: 'data:image/jpeg;base64,'+ personne.getImage()}} style={styles.image} />
             <Text style={styles.name}>{personne.getName()}</Text>
         </View>
     )
